@@ -9,6 +9,7 @@ export const BLOCK_TYPES = [
   { label: "UL", style: "unordered-list-item" },
   { label: "OL", style: "ordered-list-item" },
   { label: "Code Block", style: "code-block" },
+  { label: "Variable", style: "variable" },
 ];
 
 // Custom overrides for "code" style.
