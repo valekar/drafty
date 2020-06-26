@@ -12,6 +12,7 @@ import BlockStyleControls from "./BlockStyleControls";
 import InlineStyleControls from "./InlineStyleControls";
 import { styleMap } from "./Constants";
 import { stateToHTML } from "draft-js-export-html";
+import AgreementList from "../OtherComponents/AgreementList";
 
 class MyEditor extends React.Component {
   constructor(props) {
@@ -19,6 +20,9 @@ class MyEditor extends React.Component {
     this.state = {
       editorState: EditorState.createEmpty(),
       agreementHtml: null,
+      agreementFields: null,
+      editorPlaceHoldersCounter: 0,
+      editorPlaceHolders: [],
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -32,14 +36,13 @@ class MyEditor extends React.Component {
     this.getValue = this._getValue.bind(this);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.editorState !== prevState.editorState) {
-      console.log("eee");
-      this.setState({
-        agreementHtml: stateToHTML(this.state.editorState.getCurrentContent()),
-      });
-    }
-  }
+  // componentDidUpdate(_, prevState) {
+  //   if (this.state.editorState !== prevState.editorState) {
+  //     this.setState({
+  //       agreementHtml: stateToHTML(this.state.editorState.getCurrentContent()),
+  //     });
+  //   }
+  // }
 
   _handleKeyCommand(command, editorState) {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -75,13 +78,23 @@ class MyEditor extends React.Component {
     );
   }
 
-  _insertPlaceholder(placeholderText) {
-    const { editorState } = this.state;
+  _insertPlaceholder() {
+    const {
+      editorState,
+      editorPlaceHoldersCounter,
+      editorPlaceHolders,
+    } = this.state;
+    let field = null;
+    field = `[[field_${editorPlaceHoldersCounter}]]`;
+    this.setState({
+      editorPlaceHoldersCounter: editorPlaceHoldersCounter + 1,
+      editorPlaceHolders: [...editorPlaceHolders, field],
+    });
 
     const newContentState = Modifier.insertText(
       editorState.getCurrentContent(), // get ContentState from EditorState
       editorState.getSelection(),
-      placeholderText
+      field
     );
 
     this.setState({
@@ -90,8 +103,10 @@ class MyEditor extends React.Component {
   }
 
   _getValue() {
+    console.log(stateToHTML(this.state.editorState.getCurrentContent()));
     this.setState({
       agreementHtml: stateToHTML(this.state.editorState.getCurrentContent()),
+      agreementFields: this.state.editorPlaceHolders,
     });
   }
 
@@ -117,6 +132,10 @@ class MyEditor extends React.Component {
       }
     };
 
+    const handleChildBlurEvent = (index, value) => {
+      console.log(index, value);
+    };
+
     return (
       <div>
         <div className="RichEditor-root">
@@ -128,8 +147,8 @@ class MyEditor extends React.Component {
             editorState={editorState}
             onToggle={this.toggleInlineStyle}
           />
-          <button onClick={this.insertPlaceholder.bind(this, "{{first_name}}")}>
-            Add First Name
+          <button onClick={this.insertPlaceholder.bind(this)}>
+            Add variable
           </button>
           <div className={className} onClick={this.focus}>
             <Editor
@@ -139,7 +158,7 @@ class MyEditor extends React.Component {
               handleKeyCommand={this.handleKeyCommand}
               keyBindingFn={this.mapKeyToEditorCommand}
               onChange={this.onChange}
-              placeholder="Tell a story..."
+              placeholder="Create your own agreement"
               ref="editor"
               spellCheck={true}
             />
@@ -149,6 +168,16 @@ class MyEditor extends React.Component {
         <div
           dangerouslySetInnerHTML={{ __html: this.state.agreementHtml }}
         ></div>
+        <br />
+        {this.state.agreementFields && (
+          <AgreementList
+            agreementFields={this.state.agreementFields}
+            onSubmit={(values) => {
+              alert(values);
+            }}
+            onChildBlur={handleChildBlurEvent}
+          />
+        )}
       </div>
     );
   }
