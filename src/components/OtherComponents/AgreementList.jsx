@@ -17,8 +17,8 @@ const AgreementList = (props) => (
                   <div key={index}>
                     <Field
                       name={`fields.${index}`}
-                      onBlur={(e) => {
-                        props.onChildBlur(index, e.currentTarget.value);
+                      onKeyDown={(e) => {
+                        props.onChildKeyDown(index, e.currentTarget.value);
                       }}
                     />
                   </div>
