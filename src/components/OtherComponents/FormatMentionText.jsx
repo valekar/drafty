@@ -10,22 +10,31 @@ const FormatMentionText = (props) => {
     if (!values.length) return text;
     return (
       <div>
-        {text.split(regex).reduce((prev, current, i) => {
-          if (!i) return [current];
+        {text
+          .split(regex)
+          .reduce((prev, current, i) => {
+            if (!i) return [current];
 
-          return prev.concat(
-            values.includes(current) ? (
-              <input key={i + current} type="text" value={current} />
-            ) : (
-              current
-            )
-          );
-        }, [])}
+            return prev.concat(
+              values.includes(current)
+                ? ReactDOMServer.renderToStaticMarkup(
+                    <input key={i + current} type="text" value={current} />
+                  )
+                : current
+            );
+          }, [])
+          .join("")}
       </div>
     );
   };
 
-  return <div>{formatMentionText(props.text, props.values, reg)}</div>;
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: formatMentionText(props.text, props.values, reg).props.children,
+      }}
+    ></div>
+  );
 };
 
 export default FormatMentionText;

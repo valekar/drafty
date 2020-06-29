@@ -201,15 +201,20 @@ class MyEditor extends React.Component {
         </div>
         <button onClick={this.getValue.bind(this)}> Get Content</button>
 
-        {this.state.agreementHtml && (
+        {/* {this.state.agreementHtml && (
           <div
             dangerouslySetInnerHTML={{
               __html: this.state.agreementHtml.props.children,
             }}
           ></div>
-        )}
+        )} */}
 
-        {/* {this.state.agreementHtml && <FormatMentionText text={} value={}/>} */}
+        {this.state.agreementHtml && (
+          <FormatMentionText
+            text={stateToHTML(this.state.editorState.getCurrentContent())}
+            values={this.state.editorFieldNames}
+          />
+        )}
 
         <br />
         {this.state.agreementFields && (
