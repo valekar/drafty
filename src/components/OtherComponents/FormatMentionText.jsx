@@ -2,10 +2,9 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 
 const FormatMentionText = (props) => {
-  //const text = "Lorem ipsum dolor sit amet [[Jonh Doe]] and [[Jane Doe]]";
-  //const values = ["Jonh Doe", "Jane Doe"];
   const reg = new RegExp(/\[\[(.*?)\]\]/); // Match text inside two square brackets
 
+  console.log(props.values);
   const formatMentionText = (text, values, regex) => {
     if (!values.length) return text;
     return (
@@ -13,12 +12,19 @@ const FormatMentionText = (props) => {
         {text
           .split(regex)
           .reduce((prev, current, i) => {
+            // console.log("CURRENT" + current);
+            // console.log("Prev " + prev);
+            // console.log(i);
             if (!i) return [current];
 
             return prev.concat(
               values.includes(current)
                 ? ReactDOMServer.renderToStaticMarkup(
-                    <input key={i + current} type="text" value={current} />
+                    <input
+                      key={i + current}
+                      type="text"
+                      defaultValue={values[0]}
+                    />
                   )
                 : current
             );
@@ -29,11 +35,14 @@ const FormatMentionText = (props) => {
   };
 
   return (
-    <div
-      dangerouslySetInnerHTML={{
-        __html: formatMentionText(props.text, props.values, reg).props.children,
-      }}
-    ></div>
+    <div>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: formatMentionText(props.text, props.values, reg).props
+            .children,
+        }}
+      ></div>
+    </div>
   );
 };
 

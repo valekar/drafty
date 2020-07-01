@@ -13,20 +13,20 @@ import InlineStyleControls from "./InlineStyleControls";
 import { styleMap } from "./Constants";
 import { stateToHTML } from "draft-js-export-html";
 import AgreementList from "../OtherComponents/AgreementList";
-import FormatMentionText, {
-  formatMentionText,
-} from "../OtherComponents/FormatMentionText";
+import FormatMentionText from "../OtherComponents/FormatMentionText";
+import StringReplace from "../OtherComponents/StringReplace";
 
 class MyEditor extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       editorState: EditorState.createEmpty(),
-      agreementHtml: null,
+      enableHtml: false,
       agreementFields: null,
       editorPlaceHoldersCounter: 0,
       editorPlaceHolders: [],
       editorFieldNames: [],
+      formValues: false,
     };
 
     this.focus = () => this.refs.editor.focus();
@@ -111,38 +111,31 @@ class MyEditor extends React.Component {
   }
 
   _getValue() {
-    // console.log(stateToHTML(this.state.editorState.getCurrentContent()));
-    let resultant = formatMentionText(
-      stateToHTML(this.state.editorState.getCurrentContent()),
-      this.state.editorFieldNames
-    );
-
-    //resultant = stateToHTML(resultant);
-    console.log(resultant);
-
     this.setState({
-      agreementHtml: resultant,
+      enableHtml: true,
       agreementFields: this.state.editorPlaceHolders,
     });
   }
 
   _handleChildKeyDownEvent(index, value) {
-    const { editorFieldNames } = this.state;
+    if (this.state.agreementFields) {
+      if (!this.state.formValues) {
+        this.setState({ formValues: true });
+      }
 
-    if (this.state.editorFieldNames.length > 0) {
-      let editorNames = [...editorFieldNames];
-      let editorName = editorNames[0];
+      if (this.state.editorFieldNames.length > 0) {
+        let editorNames = [...this.state.editorFieldNames];
+        let editorName = editorNames[index];
 
-      editorName = "valuee";
-      editorNames[0] = editorName;
-      this.setState({
-        editorFieldNames: editorNames,
-      });
-      console.log(editorName);
-      console.log(index, value);
+        editorName = value;
+        editorNames[index] = editorName;
+        this.setState({
+          editorFieldNames: editorNames,
+        });
+      }
+
+      // console.log(index, value);
     }
-
-    //console.log(this.state);
   }
 
   render() {
@@ -201,20 +194,18 @@ class MyEditor extends React.Component {
         </div>
         <button onClick={this.getValue.bind(this)}> Get Content</button>
 
-        {/* {this.state.agreementHtml && (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: this.state.agreementHtml.props.children,
-            }}
-          ></div>
-        )} */}
-
-        {this.state.agreementHtml && (
+        {/* {this.state.enableHtml && (
           <FormatMentionText
             text={stateToHTML(this.state.editorState.getCurrentContent())}
             values={this.state.editorFieldNames}
+            formValues={this.state.formValues}
           />
-        )}
+        )} */}
+
+        <StringReplace
+          text={stateToHTML(this.state.editorState.getCurrentContent())}
+          values={this.state.editorFieldNames}
+        />
 
         <br />
         {this.state.agreementFields && (
