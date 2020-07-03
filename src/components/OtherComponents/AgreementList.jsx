@@ -18,8 +18,13 @@ const AgreementList = (props) => (
                     <Field
                       name={`fields.${index}`}
                       onKeyUp={(e) => {
-                        props.onChildKeyDown(index, e.currentTarget.value);
+                        props.onChildKeyDown(
+                          index,
+                          e.currentTarget.value,
+                          `field_${index}`
+                        );
                       }}
+                      placeholder={"friend"}
                     />
                   </div>
                 ))}

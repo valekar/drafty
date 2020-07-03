@@ -96,7 +96,7 @@ class MyEditor extends React.Component {
     this.setState({
       editorPlaceHoldersCounter: editorPlaceHoldersCounter + 1,
       editorPlaceHolders: [...editorPlaceHolders, field],
-      editorFieldNames: [...editorFieldNames, field_name],
+      editorFieldNames: [...editorFieldNames, { [field_name]: field }],
     });
 
     const newContentState = Modifier.insertText(
@@ -117,7 +117,7 @@ class MyEditor extends React.Component {
     });
   }
 
-  _handleChildKeyDownEvent(index, value) {
+  _handleChildKeyDownEvent(index, value, field_name) {
     if (this.state.agreementFields) {
       if (!this.state.formValues) {
         this.setState({ formValues: true });
@@ -126,9 +126,8 @@ class MyEditor extends React.Component {
       if (this.state.editorFieldNames.length > 0) {
         let editorNames = [...this.state.editorFieldNames];
         let editorName = editorNames[index];
-
         editorName = value;
-        editorNames[index] = editorName;
+        editorNames[index][field_name] = editorName;
         this.setState({
           editorFieldNames: editorNames,
         });
@@ -193,14 +192,6 @@ class MyEditor extends React.Component {
           </div>
         </div>
         <button onClick={this.getValue.bind(this)}> Get Content</button>
-
-        {/* {this.state.enableHtml && (
-          <FormatMentionText
-            text={stateToHTML(this.state.editorState.getCurrentContent())}
-            values={this.state.editorFieldNames}
-            formValues={this.state.formValues}
-          />
-        )} */}
 
         <StringReplace
           text={stateToHTML(this.state.editorState.getCurrentContent())}
